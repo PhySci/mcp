@@ -7,8 +7,8 @@ from pathlib import Path
 from pprint import pprint
 from typing import Dict
 
-
 MAX_TIMEOUT = 15.0
+
 
 class TestMCP(unittest.TestCase):
     _mcp_proc: subprocess.Popen[str] | None = None
@@ -99,12 +99,27 @@ class TestMCP(unittest.TestCase):
 
         data = self._read_write(request)
         tools = data.get("result", {}).get("tools", [])
-
         self.assertGreater(len(tools), 0)
 
+    def test_3_get_tables(self):
+        request = {
+            "jsonrpc": "2.0",
+            "id": 3,
+            "method": "tools/call",
+            "params": {
+                "name": "get_all_tables",
+                "arguments": {}
 
+            }
+        }
 
+        data = self._read_write(request)
 
+        try:
+            result = data["result"]["structuredContent"]["result"]
+            self.assertGreater(len(result), 0)
+        except:
+            self.fail("Result is incomplete")
 
 
 

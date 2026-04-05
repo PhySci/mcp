@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from typing import Any, Iterator, Dict
+import logging
 
 import psycopg
 from psycopg import Connection
@@ -12,6 +13,7 @@ from psycopg.rows import dict_row
 
 
 _pg_connector = None
+_logger = logging.getLogger(__name__)
 
 class PostgresConnector:
     """
@@ -56,11 +58,13 @@ class PostgresConnector:
         as_dicts: bool = True,
     ) -> list[dict[str, Any]] | list[tuple[Any, ...]]:
         """SELECT: return all rows."""
+        _logger.debug("Get SQL request: %s", sql)
         row_factory = dict_row if as_dicts else None
         with self.connection(autocommit=True) as conn:
             with conn.cursor(row_factory=row_factory) as cur:
                 cur.execute(sql, params or ())
                 rows = cur.fetchall()
+        _logger.debug("Raw response: %s", repr(rows))
         return list(rows)
 
     def fetch_one(
