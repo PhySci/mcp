@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Any, Iterator
+from typing import Any, Iterator, Dict
 
 import psycopg
 from psycopg import Connection
 from psycopg.conninfo import make_conninfo
 from psycopg.rows import dict_row
 
+
+_pg_connector = None
 
 class PostgresConnector:
     """
@@ -84,3 +86,12 @@ class PostgresConnector:
         with self.connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(sql, params or ())
+
+
+def get_pg_connector(db_params: Dict = {}):
+    global _pg_connector
+    if _pg_connector is None:
+        if len(db_params) == 0:
+            raise ValueError("DB params are required to init Postgres connection")
+        _pg_connector = PostgresConnector(db_params)
+    return _pg_connector
