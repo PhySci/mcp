@@ -116,6 +116,8 @@ class TestMCP(unittest.TestCase):
         }
 
         data = self._read_write(request)
+
+        self.assertFalse(data["result"]["isError"])
         try:
             result = data["result"]["structuredContent"]["result"]
             self.assertGreater(len(result), 0)
@@ -136,11 +138,46 @@ class TestMCP(unittest.TestCase):
         }
         data = self._read_write(request)
 
+        self.assertFalse(data["result"]["isError"])
         try:
             result = data["result"]["structuredContent"]["result"]
             self.assertGreater(len(result), 0)
         except:
             self.fail("Result is incomplete")
+
+    def test_5_get_pk(self):
+        request = {
+            "jsonrpc": "2.0",
+            "id": 5,
+            "method": "tools/call",
+            "params": {
+                "name": "get_table_primary_key",
+                "arguments": {
+                    "table_name": "orders"
+                }
+            }
+        }
+
+        data = self._read_write(request)
+        self.assertFalse(data["result"]["isError"])
+        print(data)
+
+    def test_5_get_fk(self):
+        request = {
+            "jsonrpc": "2.0",
+            "id": 6,
+            "method": "tools/call",
+            "params": {
+                "name": "get_table_foreign_key",
+                "arguments": {
+                    "table_name": "orders"
+                }
+            }
+        }
+
+        data = self._read_write(request)
+        self.assertFalse(data["result"]["isError"])
+        print(data)
 
 
 if __name__ == "__main__":

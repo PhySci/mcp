@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Any
 
 import configargparse
 from fastmcp import FastMCP
@@ -50,7 +50,7 @@ def get_all_tables() -> List[str]:
 
 
 @mcp.tool(tags={"db"})
-def get_table_columns(table_name: str) -> str:
+def get_table_columns(table_name: str) -> List[Dict[str, Any]]:
     """
     Returns list of columns in the given table
     """
@@ -68,6 +68,54 @@ def get_table_columns(table_name: str) -> str:
         "is_nullable": el["is_nullable"]
         } for el in res]
     return columns
+
+
+@mcp.tool(tags={"db"})
+def get_table_primary_key(table_name: str) -> List[Dict[str, Any]]:
+    """"
+    Returns table primary key
+    :param table_name:
+    """
+    query = """
+            SELECT kcu.column_name
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu
+              ON tc.constraint_name = kcu.constraint_name
+            WHERE tc.constraint_type = 'PRIMARY KEY'
+              AND tc.table_name = %s;
+        """
+
+    pg_connector = get_pg_connector()
+    res = pg_connector.fetch_one(query, (table_name,))
+    return  [{"primary_key": res["column_name"]}]
+
+
+@mcp.tool(tags={"db"})
+def get_table_foreign_key(table_name: str) -> List[Dict[str, Any]]:
+    """
+    Returns table foreign key
+    :param table_name:
+    """
+    query = """
+        SELECT
+          kcu.column_name,
+          ccu.table_name AS foreign_table,
+          ccu.column_name AS foreign_column
+        FROM information_schema.table_constraints tc
+        JOIN information_schema.key_column_usage kcu
+          ON tc.constraint_name = kcu.constraint_name
+        JOIN information_schema.constraint_column_usage ccu
+          ON ccu.constraint_name = tc.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY'
+          AND tc.table_name = %s;
+        """
+    pg_connector = get_pg_connector()
+    res = pg_connector.fetch_all(query, (table_name,))
+    return  [{"column_name": el["column"],
+              "foreign_table": el["foreign_column"],
+              "foreign_column": el["foreign_column"]}
+             for el in res]
+
 
 @mcp.custom_route("/health", methods=["GET"])
 async def health_check(request: Request) -> PlainTextResponse:
