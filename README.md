@@ -8,6 +8,8 @@ An [FastMCP](https://github.com/jlowin/fastmcp)-based MCP server for PostgreSQL 
 
 1. _get_all_tables_ - list all tables in the DB;
 2. _get_table_columns_ - list all columns in the specified table;
+3. _get_table_primary_key_ - list table primary key;
+4. _get_table_foreign_keys_ - list table foreign key.
 
 
 ## Install
