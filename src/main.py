@@ -111,10 +111,14 @@ def get_table_foreign_key(table_name: str) -> List[Dict[str, Any]]:
         """
     pg_connector = get_pg_connector()
     res = pg_connector.fetch_all(query, (table_name,))
-    return  [{"column_name": el["column"],
-              "foreign_table": el["foreign_column"],
-              "foreign_column": el["foreign_column"]}
-             for el in res]
+    return [
+        {
+            "column_name": el["column_name"],
+            "foreign_table": el["foreign_table"],
+            "foreign_column": el["foreign_column"],
+        }
+        for el in res
+    ]
 
 
 @mcp.custom_route("/health", methods=["GET"])
