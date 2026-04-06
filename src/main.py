@@ -50,19 +50,24 @@ def get_all_tables() -> List[str]:
 
 
 @mcp.tool(tags={"db"})
-def get_table_columns() -> str:
+def get_table_columns(table_name: str) -> str:
     """
-    Returns list of tables in the DB
+    Returns list of columns in the given table
     """
     query = """
-          SELECT table_name AS tn
-          FROM information_schema.tables
-          WHERE table_schema = 'public';
+          SELECT column_name, data_type, is_nullable
+          FROM information_schema.columns
+          WHERE table_name = %s;
           """
     pg_connector = get_pg_connector()
-    res = pg_connector.fetch_all(query)
-    return " ".join([el["tn"] for el in res])
+    res = pg_connector.fetch_all(query, (table_name,))
 
+    columns = [{
+        "name": el["column_name"],
+        "type": el["data_type"],
+        "is_nullable": el["is_nullable"]
+        } for el in res]
+    return columns
 
 @mcp.custom_route("/health", methods=["GET"])
 async def health_check(request: Request) -> PlainTextResponse:

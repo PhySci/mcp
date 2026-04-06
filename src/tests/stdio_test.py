@@ -7,6 +7,8 @@ from pathlib import Path
 from pprint import pprint
 from typing import Dict
 
+from httpcore import request
+
 MAX_TIMEOUT = 15.0
 
 
@@ -114,13 +116,31 @@ class TestMCP(unittest.TestCase):
         }
 
         data = self._read_write(request)
-
         try:
             result = data["result"]["structuredContent"]["result"]
             self.assertGreater(len(result), 0)
         except:
             self.fail("Result is incomplete")
 
+    def test_4_get_columns(self):
+        request = {
+            "jsonrpc": "2.0",
+            "id": 4,
+            "method": "tools/call",
+            "params": {
+                "name": "get_table_columns",
+                "arguments": {
+                    "table_name": "orders"
+                }
+            }
+        }
+        data = self._read_write(request)
+
+        try:
+            result = data["result"]["structuredContent"]["result"]
+            self.assertGreater(len(result), 0)
+        except:
+            self.fail("Result is incomplete")
 
 
 if __name__ == "__main__":

@@ -4,6 +4,12 @@ An [FastMCP](https://github.com/jlowin/fastmcp)-based MCP server for PostgreSQL 
 
 **Requirements:** Python 3.14+, [uv](https://github.com/astral-sh/uv), and a running PostgreSQL instance.
 
+## List of available tools
+
+1. _get_all_tables_ - list all tables in the DB;
+2. _get_table_columns_ - list all columns in the specified table;
+
+
 ## Install
 
 ```bash
@@ -12,6 +18,8 @@ uv sync
 ```
 
 ## Database configuration
+
+### Init file
 
 By default, `env/local.ini` is read (path is relative to the repo root, not the current working directory). Copy the example and set your values:
 
@@ -23,7 +31,11 @@ db_user=postgres
 db_password=secret
 ```
 
-The same settings can be passed via environment variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` or CLI flags `--db_host`, `--db_port`, etc. (see `python src/main.py --help`).
+### Env variables
+The same settings can be passed via environment variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+
+### CLI flags
+Or use CLI flags `--db_host`, `--db_port`, etc. (see `python src/main.py --help`).
 
 ## Run the server
 
